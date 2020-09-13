@@ -1,0 +1,36 @@
+assign_issues_by:
+- labels:
+  - 'api: appengine'
+  to:
+  - engelke
+- labels:
+  - 'api: automl'
+  to:
+  - sirtorry
+  - telpirion
+- labels:
+  - 'api: bigquery'
+  to:
+  - shollyman
+- labels:
+  - 'api: bigtable'
+  to:
+  - billyjacobson
+
+assign_issues:
+  - busunkim96
+  - leahecole
+  - crwilcox
+  - tmatsuo
+  - engelke
+  - kurtisvg
+  - dinagraves
+
+assign_prs:
+  - busunkim96
+  - leahecole
+  - crwilcox
+  - tmatsuo
+  - engelke
+  - kurtisvg
+  - dinagraves

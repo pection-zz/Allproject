@@ -1,0 +1,12 @@
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /datastore.*
+  script: datastore.app
+- url: /memcache.*
+  script: memcache.app
+- url: /task.*
+  script: taskqueue.app
+

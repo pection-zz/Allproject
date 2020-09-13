@@ -1,0 +1,21 @@
+
+--This widget alerts the notification badges to stop showing if Do Not Disturb is on.
+--It never shows itself, it works in the background.
+
+tell application "BetterTouchTool"
+	try
+		set dndEnabled to get_number_variable "SystemDoNotDisturbState"
+	end try
+	if dndEnabled is 1 then
+		set_persistent_string_variable "DNDStatus" to "ON"
+		return ""
+
+	else if dndEnabled is 0 then
+		set_persistent_string_variable "DNDStatus" to "OFF"
+		return ""
+
+	else if dndEnabled is missing value then
+		set_persistent_string_variable "DNDStatus" to "OFF"
+		return ""
+	end if
+end tell
