@@ -1,0 +1,142 @@
+set itemsToDelete2 to {"likes", " ", "  • ", "•", "view", "views", "Home", "Hotlist", "Library", "Queue", "Videos", "Songs", "Playlists", "Artists", "Albums", "2017", "2018", "2020", "2019", "ไม่ได้ทำเพื่อการกุศล", "SUBSCRIBE", " ", "", " • ", "2015", "2016", "SINGLE"}
+set HighValueDevicesPass to {"[", "(", "."}
+set counttime to 1
+set StartFind to "False"
+set cleanartist4 to {}
+set cleanartist2 to {}
+set cleanartist3 to {}
+set namesongsplit to {}
+set namesongsplit to {}
+set artistsong to {}
+set mike to {}
+set str to "" as string
+
+tell application "Safari"
+	repeat with t in tabs of windows
+		tell t
+			if URL starts with "https://music.youtube.com" then
+				set tmp2 to text of t as string
+				set title2 to text 2 thru -1 of tmp2
+				set StartFind to "True"
+			end if
+		end tell
+	end repeat
+end tell
+
+if StartFind is "True" then
+	-- set AppleScript's text item delimiters to " - YouTube Music"
+	-- set namesong to text item 1 of title as string
+	-- set AppleScript's text item delimiters to namesong
+	set artist to paragraphs of title2
+	removeItem(artist, itemsToDelete2)
+	set cleanartist4 to removeItem(artist, itemsToDelete2)
+	set Nowplaying to (getIndex of "Player bar" from cleanartist4) + 1
+	repeat with i from Nowplaying to (length of cleanartist4)
+		--log (i)
+		copy cleanartist4's item i to the end of the cleanartist2
+	end repeat
+
+	if length of splitText((cleanartist2's item 2), "-") is 2 then
+		set charListartist to removeItem(characters of cleanartist2's item 2 as string, itemsToDelete2)
+		set splitIndex to (getIndex of "-" from charListartist)
+		repeat with i from 1 to length of (charListartist)
+			if counttime is less than splitIndex then
+				set charListartist's item i to the end of the namesongsplit
+			end if
+			if counttime is greater than splitIndex then
+				set charListartist's item i to the end of the artistsong
+			end if
+			set counttime to counttime + 1
+		end repeat
+	else if length of splitText((cleanartist2's item 2), "-") is 1 then
+		copy cleanartist2's item 2 to the end of the namesongsplit
+		if cleanartist2's item 2 is equal to cleanartist2's item 4 then
+			copy cleanartist2's item 3 to the end of the artistsong
+		else
+			copy cleanartist2's item 3 to the end of the artistsong
+		end if
+	end if
+	set namesongsplit to namesongsplit as text
+	set artistsong to artistsong as text
+	tell application "BetterTouchTool"
+		set_string_variable "Nowplayingstring" to cleanartist2's item 1 as text
+	end tell
+	return "{\"text\":\"" & namesongsplit & "\\n {icon} - " & artistsong & "\",\"font_color\":\"0,0,0,255\",\"icon_path\":\"~/mike2.png\"}"
+end if
+
+on name_matches(match_text)
+	set match_words to words of match_text
+	repeat with i from 1 to (count match_words)
+		if nameOnDevice contains item i of match_words then
+			return true
+		end if
+	end repeat
+	return false
+end name_matches
+to getIndex of i from l
+	set tid to text item delimiters
+	set text item delimiters to return
+	set l to return & l & return
+	set text item delimiters to return & i & return
+	tell l's text items to if (count) is 1 then
+		set i to 0
+	else
+		set i to count item 1's paragraphs
+	end if
+	set text item delimiters to tid
+	return i
+end getIndex
+on convertListToString(theList, theDelimiter)
+	set AppleScript's text item delimiters to theDelimiter
+	set theString to theList as string
+	set AppleScript's text item delimiters to ""
+	return theString
+end convertListToString
+on removeItem(theList, itemsToDelete)
+	set cleanList to {}
+	repeat with i from 1 to count theList
+		if {theList's item i} is not in itemsToDelete then
+			set cleanList's end to theList's item i
+		end if
+	end repeat
+	return cleanList
+end removeItem
+on checkContain(theList, itemsToDelete)
+	set cleanList to {}
+	repeat with j from 1 to count theList
+		repeat with i from 1 to count itemsToDelete
+			if name_matches(theList's item j, itemsToDelete's item i) then
+				exit repeat
+			else
+				set cleanList's end to theList's item j
+			end if
+		end repeat
+	end repeat
+	return cleanList
+end checkContain
+on splitText(theText, theDelimiter)
+	set AppleScript's text item delimiters to theDelimiter
+	set theTextItems to every text item of theText
+	set AppleScript's text item delimiters to ""
+	return theTextItems
+end splitText
+on removesplitText(listitem, removeItem, outputset)
+	if class of listitem is string then
+		set listitem to {listitem}
+	end if
+	if length of listitem is 1 then
+		set outputset's end to makeUpper(listitem's item 1)
+		return outputset
+	end if
+	repeat with i from 1 to length of listitem
+		--log splitText(listitem's item i, removeitem) & i
+		if length of splitText(listitem's item i, removeItem) < 2 then
+			set outputset's end to makeUpper(listitem's item i)
+		else
+			repeat with j from 1 to length of splitText(listitem's item i, removeItem)
+				set outputset's end to makeUpper(splitText(listitem's item i, removeItem)'s item j)
+			end repeat
+		end if
+	end repeat
+	return outputset
+end removesplitText
